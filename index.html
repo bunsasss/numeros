@@ -1,235 +1,465 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="obsidian">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Numeros is a mystical numerology calculator for life path, destiny, soul urge, and personality insights."
-    />
-    <meta name="color-scheme" content="dark" />
-    <meta property="og:title" content="Numeros | Mystical Numerology Calculator" />
-    <meta property="og:description" content="Explore the hidden rhythm of your life through numerology." />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="A numerology studio for life path, destiny, soul urge, personality, pinnacles and personal cycles." />
+    <meta name="color-scheme" content="dark light" />
+    <meta property="og:title" content="Numeros — Numerology Studio" />
+    <meta property="og:description" content="Read the letters of your name and the shape of your birth date." />
     <meta property="og:type" content="website" />
-    <title id="pageTitle">Numeros | Mystical Numerology Calculator</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>Numeros — Numerology Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..900&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400..800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles/app.css" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%2307090C' stroke='%23E8B45C' stroke-width='1.5'/%3E%3Ctext x='16' y='22' font-family='Georgia,serif' font-size='16' fill='%23E8B45C' text-anchor='middle'%3E9%3C/text%3E%3C/svg%3E"
+    />
   </head>
   <body>
-    <div class="stars" id="stars" aria-hidden="true"></div>
-    <div class="aurora aurora-one" aria-hidden="true"></div>
-    <div class="aurora aurora-two" aria-hidden="true"></div>
+    <canvas class="sky" id="sky" aria-hidden="true"></canvas>
+    <div class="mesh" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
 
-    <main class="app-shell">
-      <header class="hero">
-        <div class="hero__top">
-          <div class="hero__badge" data-i18n="heroBadge">Cosmic Insight • Numerology</div>
-          <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language">
-            <span class="lang-toggle__chip is-active" data-lang="en">EN</span>
-            <span class="lang-toggle__divider">/</span>
-            <span class="lang-toggle__chip" data-lang="vi">VI</span>
+    <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="i-chart" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/><path d="M12 3v5.8M12 15.2V21M3 12h5.8M15.2 12H21M5.6 5.6l4.1 4.1M14.3 14.3l4.1 4.1M18.4 5.6l-4.1 4.1M9.7 14.3l-4.1 4.1"/></symbol>
+      <symbol id="i-timeline" viewBox="0 0 24 24"><path d="M3 7h18M3 17h18"/><circle cx="7.5" cy="7" r="2.2"/><circle cx="15" cy="17" r="2.2"/><path d="M7.5 9.2V17M15 7v7.8"/></symbol>
+      <symbol id="i-cycles" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="8.5" cy="14.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="14.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="14.5" r="1.1" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-bond" viewBox="0 0 24 24"><circle cx="8.5" cy="12" r="5.5"/><circle cx="15.5" cy="12" r="5.5"/></symbol>
+      <symbol id="i-atlas" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H19v5H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M9 7.5h6M9 11h4"/></symbol>
+      <symbol id="i-journal" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/><path d="M9 8h6"/></symbol>
+      <symbol id="i-sound-on" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11"/></symbol>
+      <symbol id="i-sound-off" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2z"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/></symbol>
+      <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 15.5V3.5M8.2 7.3L12 3.5l3.8 3.8"/><path d="M4.5 14v5.5a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V14"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+      <symbol id="i-left" viewBox="0 0 24 24"><path d="M14.5 5.5L8 12l6.5 6.5"/></symbol>
+      <symbol id="i-right" viewBox="0 0 24 24"><path d="M9.5 5.5L16 12l-6.5 6.5"/></symbol>
+      <symbol id="i-down" viewBox="0 0 24 24"><path d="M5.5 9.5L12 16l6.5-6.5"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="M15.4 15.4L20 20"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 6.5h15M9.5 6.5V4.2h5v2.3M6.5 6.5l1 13.3h9l1-13.3"/><path d="M10.2 10v6M13.8 10v6"/></symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4.2L19 9.2a2.1 2.1 0 0 0-3-3L5.2 17z"/><path d="M14.8 7.4l2.8 2.8"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.8l4.4 4.4L19 6.8"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="2"/><path d="M15.5 5.5A2 2 0 0 0 13.5 3.5h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2"/></symbol>
+      <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.2 4.2 0 0 0 6 0l3-3a4.24 4.24 0 0 0-6-6l-1.4 1.4"/><path d="M14 10a4.2 4.2 0 0 0-6 0l-3 3a4.24 4.24 0 0 0 6 6l1.4-1.4"/></symbol>
+      <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V3.5h10V9"/><rect x="3.5" y="9" width="17" height="7.5" rx="1.8"/><path d="M7 14h10v6.5H7z"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3.5v12M8.2 11.7L12 15.5l3.8-3.8"/><path d="M4.5 19.5h15"/></symbol>
+      <symbol id="i-undo" viewBox="0 0 24 24"><path d="M4 9h9.5a5.5 5.5 0 0 1 0 11H8"/><path d="M7.5 5.5L4 9l3.5 3.5"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.4z"/><path d="M18.5 16.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></symbol>
+      <symbol id="i-swap" viewBox="0 0 24 24"><path d="M4 8.5h13M13.5 5L17 8.5 13.5 12"/><path d="M20 15.5H7M10.5 12L7 15.5 10.5 19"/></symbol>
+      <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.9"/><path d="M4.8 20.2a7.2 7.2 0 0 1 14.4 0"/></symbol>
+      <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.9" r="1" fill="currentColor" stroke="none"/></symbol>
+      <symbol id="i-select" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M7.8 12.2l2.8 2.8 5.6-6"/></symbol>
+    </svg>
+
+    <a class="skip" href="#main" data-i18n="nav.chart">Skip to content</a>
+
+    <header class="topbar">
+      <div class="topbar__in">
+        <button class="brand" type="button" data-goto="chart" aria-label="Numeros">
+          <span class="brand__mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18"/><path d="M20 2v36M2 20h36M7.3 7.3l25.4 25.4M32.7 7.3L7.3 32.7"/><circle cx="20" cy="20" r="7.4"/></svg>
+          </span>
+          <span class="brand__text">
+            <strong>Numeros</strong>
+            <small data-i18n="brand.tagline">Numerology studio</small>
+          </span>
+        </button>
+
+        <button class="profile-chip" id="profileChip" type="button">
+          <span class="profile-chip__dot" id="profileDot" aria-hidden="true">—</span>
+          <span class="profile-chip__text">
+            <strong id="profileName">Set your details</strong>
+            <small id="profileMeta"></small>
+          </span>
+          <svg class="ico ico--sm" aria-hidden="true"><use href="#i-edit" /></svg>
+        </button>
+
+        <div class="topbar__tools">
+          <div class="seg seg--lang" id="langSeg" role="group" aria-label="Language">
+            <button type="button" class="seg__btn is-on" data-lang="en">EN</button>
+            <button type="button" class="seg__btn" data-lang="vi">VI</button>
+          </div>
+          <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true" data-tip="Sound">
+            <svg class="ico" aria-hidden="true"><use href="#i-sound-on" id="soundIcon" /></svg>
+          </button>
+          <button class="icon-btn" id="themeBtn" type="button" data-tip="Theme">
+            <svg class="ico" aria-hidden="true"><use href="#i-sun" id="themeIcon" /></svg>
+          </button>
+          <div class="menu-wrap">
+            <button class="icon-btn" id="exportBtn" type="button" aria-haspopup="true" aria-expanded="false" data-tip="Export">
+              <svg class="ico" aria-hidden="true"><use href="#i-export" /></svg>
+            </button>
+            <div class="menu" id="exportMenu" role="menu" hidden>
+              <p class="menu__title" data-i18n="export.title">Take it with you</p>
+              <button type="button" role="menuitem" data-export="copy"><svg class="ico ico--sm" aria-hidden="true"><use href="#i-copy" /></svg><span data-i18n="export.copy">Copy summary</span></button>
+              <button type="button" role="menuitem" data-export="link"><svg class="ico ico--sm" aria-hidden="true"><use href="#i-link" /></svg><span data-i18n="export.link">Copy share link</span></button>
+              <button type="button" role="menuitem" data-export="download"><svg class="ico ico--sm" aria-hidden="true"><use href="#i-download" /></svg><span data-i18n="export.download">Download .txt</span></button>
+              <button type="button" role="menuitem" data-export="print"><svg class="ico ico--sm" aria-hidden="true"><use href="#i-print" /></svg><span data-i18n="export.print">Print or save as PDF</span></button>
+            </div>
+          </div>
+          <button class="icon-btn icon-btn--accent" id="journalBtn" type="button" data-tip="Journal">
+            <svg class="ico" aria-hidden="true"><use href="#i-journal" /></svg>
+            <span class="icon-btn__count" id="journalCount">0</span>
           </button>
         </div>
-        <h1 data-i18n="siteTitle">Numeros</h1>
-        <p data-i18n="heroSubtitle">
-          Reveal the hidden rhythm of your life through destiny, heart, and personality numbers.
-        </p>
-      </header>
+      </div>
+    </header>
 
-      <!-- Tab Navigation -->
-      <nav class="tab-nav" role="tablist" aria-label="Main navigation">
-        <button class="tab-nav__btn is-active" role="tab" aria-selected="true" data-tab="reading" id="tabBtnReading">
-          <span data-i18n="tabReading">Your celestial reading</span>
-        </button>
-        <button class="tab-nav__btn" role="tab" aria-selected="false" data-tab="cycles" id="tabBtnCycles">
-          <span data-i18n="tabCycles">Current Cycles</span>
-        </button>
+    <div class="layout">
+      <nav class="rail" id="rail" aria-label="Views">
+        <div class="rail__group" id="railGroup"></div>
+        <div class="rail__foot">
+          <p class="rail__note" data-i18n="footer.note">Pythagorean system · calculated on this device</p>
+        </div>
       </nav>
 
-      <!-- Tab: Reading -->
-      <div class="tab-panel is-active" role="tabpanel" id="tabPanelReading" data-tab="reading">
-        <section class="card form-card" aria-labelledby="form-title">
-          <div class="card__header">
-            <h2 id="form-title" data-i18n="formTitle">Your celestial reading</h2>
-            <p data-i18n="formSubtitle">Enter your birth details to unveil your cosmic blueprint.</p>
-          </div>
+      <main class="main" id="main">
+        <div class="banner" id="exampleBanner" hidden>
+          <svg class="ico ico--sm" aria-hidden="true"><use href="#i-info" /></svg>
+          <p data-i18n="onboarding.banner">You are exploring an example chart.</p>
+          <button class="btn btn--sm btn--brass" type="button" id="bannerAction" data-i18n="onboarding.action">Enter my own details</button>
+          <button class="icon-btn icon-btn--ghost" type="button" id="bannerDismiss" data-i18n-aria="onboarding.dismiss" aria-label="Dismiss">
+            <svg class="ico ico--sm" aria-hidden="true"><use href="#i-close" /></svg>
+          </button>
+        </div>
 
-          <form id="reading-form" novalidate>
-            <label class="field">
-              <span data-i18n="fullNameLabel">Full birth name</span>
-              <input
-                id="fullName"
-                name="fullName"
-                type="text"
-                data-i18n-placeholder="fullNamePlaceholder"
-                placeholder="Example: Maya Rose Carter"
-                required
-                autocomplete="name"
-              />
-            </label>
-
-            <label class="field">
-              <span data-i18n="birthDateLabel">Birth date</span>
-              <div class="date-fields">
-                <label class="date-field">
-                  <span class="date-field__label" data-i18n="birthMonthLabel">Month</span>
-                  <select id="birthMonth" name="birthMonth" required>
-                    <option value="" selected disabled data-i18n="monthPlaceholder">Month</option>
-                  </select>
-                </label>
-                <label class="date-field">
-                  <span class="date-field__label" data-i18n="birthDayLabel">Day</span>
-                  <select id="birthDay" name="birthDay" required>
-                    <option value="" selected disabled data-i18n="dayPlaceholder">Day</option>
-                  </select>
-                </label>
-                <label class="date-field">
-                  <span class="date-field__label" data-i18n="birthYearLabel">Year</span>
-                  <select id="birthYear" name="birthYear" required>
-                    <option value="" selected disabled data-i18n="yearPlaceholder">Year</option>
-                  </select>
-                </label>
-              </div>
-            </label>
-
-            <label class="field">
-              <span>
-                <span data-i18n="currentNameLabel">Current name</span>
-                <small data-i18n="currentNameHint">(optional)</small>
-              </span>
-              <input
-                id="currentName"
-                name="currentName"
-                type="text"
-                data-i18n-placeholder="currentNamePlaceholder"
-                placeholder="If different from your birth name"
-                autocomplete="name"
-              />
-            </label>
-
-            <button class="btn btn--primary" type="submit">
-              <span data-i18n="submitButton">Calculate my reading</span>
+        <!-- ============ CHART ============ -->
+        <section class="view" id="viewChart" data-view="chart" aria-labelledby="chartTitle">
+          <div class="empty" id="chartEmpty" hidden>
+            <div class="empty__sigil" aria-hidden="true">
+              <svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="54"/><circle cx="60" cy="60" r="38"/><path d="M60 6l46.8 81H13.2z"/><circle cx="60" cy="60" r="16"/></svg>
+            </div>
+            <h1 data-i18n="empty.title">Begin your chart</h1>
+            <p data-i18n="empty.body"></p>
+            <button class="btn btn--primary btn--lg" type="button" id="emptyStart">
+              <svg class="ico ico--sm" aria-hidden="true"><use href="#i-spark" /></svg>
+              <span data-i18n="empty.cta">Enter your details</span>
             </button>
-          </form>
-
-          <div class="progress" aria-hidden="true">
-            <div class="progress__bar" id="progressBar"></div>
+            <p class="empty__examples-label" data-i18n="empty.examples">Or explore a prepared chart</p>
+            <div class="empty__examples" id="emptyExamples"></div>
+            <p class="empty__privacy" data-i18n="empty.privacy"></p>
           </div>
-        </section>
 
-        <section class="results" id="results" hidden>
-          <div class="card summary-card">
-            <div class="summary-card__head">
+          <div id="chartBody" hidden>
+            <div class="view-head">
               <div>
-                <p class="eyebrow" data-i18n="summaryEyebrow">Your essence</p>
-                <h2 id="summaryName">Reading summary</h2>
+                <p class="eyebrow" data-i18n="brand.tagline">Numerology studio</p>
+                <h1 id="chartTitle" data-i18n="chart.title">Your chart</h1>
+                <p class="lede" data-i18n="chart.subtitle">Six core numbers, one wheel.</p>
               </div>
-              <div class="summary-card__pill" id="summaryPill">Awaiting cosmic pattern</div>
+              <div class="view-head__meta" id="chartMeta"></div>
             </div>
 
-            <div class="summary-grid">
-              <article class="summary-spotlight">
-                <p class="eyebrow" data-i18n="lifePathLabel">Life Path</p>
-                <div class="orb" id="lifePathMain">—</div>
-                <p id="lifePathText">Your life path reveals your mission.</p>
-              </article>
+            <div class="chart-hero">
+              <div class="panel wheel-panel">
+                <div class="wheel-stage">
+                  <svg id="wheel" viewBox="0 0 420 420" role="group" aria-labelledby="wheelTitle"></svg>
+                  <span id="wheelTitle" class="sr-only" data-i18n="chart.wheelLabel">The number wheel</span>
+                </div>
+                <p class="wheel-hint" data-i18n="chart.wheelHint"></p>
+                <div class="wheel-legend" id="wheelLegend"></div>
+              </div>
 
-              <div class="summary-details">
-                <div>
-                  <span class="eyebrow" data-i18n="destinyLabel">Destiny</span>
-                  <strong id="destinyMain">—</strong>
+              <div class="panel hero-read" id="heroRead">
+                <p class="eyebrow" data-i18n="chart.lifePath">Life Path</p>
+                <div class="hero-read__top">
+                  <div class="hero-num" id="heroNum">—</div>
+                  <div>
+                    <h2 id="heroTitle">—</h2>
+                    <p class="hero-tag" id="heroTag"></p>
+                  </div>
                 </div>
-                <div>
-                  <span class="eyebrow" data-i18n="soulLabel">Soul Urge</span>
-                  <strong id="soulMain">—</strong>
-                </div>
-                <div>
-                  <span class="eyebrow" data-i18n="personalityLabel">Personality</span>
-                  <strong id="personalityMain">—</strong>
-                </div>
+                <p class="hero-essence" id="heroEssence"></p>
+                <div class="chips" id="heroKeywords"></div>
+                <div class="hero-pair" id="heroPair"></div>
+                <p class="hero-as" id="heroAs"></p>
+                <div class="hero-now" id="heroNow"></div>
               </div>
             </div>
-          </div>
 
-          <div class="card numbers-card">
-            <div class="card__header">
-              <h2 data-i18n="coreNumbersTitle">Core numbers</h2>
-              <p data-i18n="coreNumbersSubtitle">Each number carries a luminous message.</p>
-            </div>
-            <div class="numbers-grid" id="numbersGrid"></div>
-          </div>
+            <section class="block">
+              <header class="block__head">
+                <div>
+                  <h2 data-i18n="chart.coreTitle">Core numbers</h2>
+                  <p data-i18n="chart.coreSubtitle">Tap a tile for the full reading.</p>
+                </div>
+              </header>
+              <div class="core-grid" id="coreGrid"></div>
+            </section>
 
-          <div class="card interpretation-card">
-            <div class="card__header">
-              <h2 data-i18n="interpretationsTitle">Interpretations</h2>
-              <p data-i18n="interpretationsSubtitle">Delve into the energy woven through your path.</p>
-            </div>
-            <div id="interpretationContent"></div>
-          </div>
+            <section class="block">
+              <header class="block__head">
+                <div>
+                  <h2 data-i18n="chart.ledgerTitle">Letter ledger</h2>
+                  <p data-i18n="chart.ledgerSubtitle"></p>
+                </div>
+                <div class="seg" id="ledgerFilter" role="group" aria-label="Filter letters">
+                  <button type="button" class="seg__btn is-on" data-filter="all" data-i18n="chart.filterAll">All</button>
+                  <button type="button" class="seg__btn" data-filter="vowel" data-i18n="chart.filterVowels">Vowels</button>
+                  <button type="button" class="seg__btn" data-filter="consonant" data-i18n="chart.filterConsonants">Consonants</button>
+                </div>
+              </header>
+              <div class="ledger-legend">
+                <span class="lg lg--vowel"><i></i><span data-i18n="chart.legendVowel"></span></span>
+                <span class="lg lg--consonant"><i></i><span data-i18n="chart.legendConsonant"></span></span>
+                <span class="lg lg--y"><i>Y</i><span data-i18n="chart.legendY"></span></span>
+              </div>
+              <div class="ledger" id="ledger"></div>
+              <div class="ledger-totals" id="ledgerTotals"></div>
+              <div class="y-rule" id="yRule"></div>
+            </section>
 
-          <div class="card compatibility-card">
-            <div class="card__header">
-              <h2 data-i18n="compatibilityTitle">Compatibility whisper</h2>
-              <p data-i18n="compatibilitySubtitle">Simple energetic pairings for your life path.</p>
-            </div>
-            <div id="compatibilityContent"></div>
-          </div>
+            <section class="block" id="nameShiftBlock" hidden>
+              <header class="block__head">
+                <div>
+                  <h2 data-i18n="chart.nameShiftTitle">Name shift</h2>
+                  <p data-i18n="chart.nameShiftSubtitle"></p>
+                </div>
+              </header>
+              <div id="nameShift"></div>
+            </section>
 
-          <div class="card calculation-card">
-            <details open>
-              <summary data-i18n="calculationTitle">How we calculated it</summary>
-              <div class="calc-list" id="calcList"></div>
-            </details>
+            <section class="block">
+              <header class="block__head">
+                <div>
+                  <h2 data-i18n="chart.readingTitle">What your Life Path says</h2>
+                </div>
+                <button class="btn btn--ghost btn--sm" type="button" id="arithToggle" aria-expanded="false">
+                  <span data-i18n="chart.arithmetic">Show the arithmetic</span>
+                  <svg class="ico ico--sm ico--flip" aria-hidden="true"><use href="#i-down" /></svg>
+                </button>
+              </header>
+              <div class="reading" id="lifeReading"></div>
+              <div class="arithmetic" id="arithmetic" hidden></div>
+            </section>
           </div>
         </section>
-      </div>
 
-      <!-- Tab: Current Cycles -->
-      <div class="tab-panel" role="tabpanel" id="tabPanelCycles" data-tab="cycles" hidden>
-        <section class="card cycles-card" aria-labelledby="cycles-title">
-          <div class="card__header">
-            <h2 id="cycles-title" data-i18n="tabCycles">Current Cycles</h2>
-            <p class="cyc-date" id="cycDate"></p>
+        <!-- ============ TIMELINE ============ -->
+        <section class="view" id="viewTimeline" data-view="timeline" hidden aria-labelledby="timelineTitle">
+          <div class="view-head">
+            <div>
+              <p class="eyebrow" data-i18n="nav.timeline">Timeline</p>
+              <h1 id="timelineTitle" data-i18n="timeline.title">Life timeline</h1>
+              <p class="lede" data-i18n="timeline.subtitle"></p>
+            </div>
+            <div class="view-head__meta" id="tlMeta"></div>
           </div>
+          <div id="tlBody"></div>
+        </section>
 
-          <!-- Birth date inputs (always visible) -->
-          <div class="cyc-form" id="cycForm">
-            <label class="field">
-              <span data-i18n="birthDateLabel">Birth date</span>
-              <div class="date-fields">
-                <label class="date-field">
-                  <span class="date-field__label" data-i18n="birthMonthLabel">Month</span>
-                  <select id="cycBirthMonth" name="cycBirthMonth" required>
-                    <option value="" selected disabled data-i18n="monthPlaceholder">Month</option>
-                  </select>
-                </label>
-                <label class="date-field">
-                  <span class="date-field__label" data-i18n="birthDayLabel">Day</span>
-                  <select id="cycBirthDay" name="cycBirthDay" required>
-                    <option value="" selected disabled data-i18n="dayPlaceholder">Day</option>
-                  </select>
-                </label>
-                <label class="date-field">
-                  <span class="date-field__label" data-i18n="birthYearLabel">Year</span>
-                  <select id="cycBirthYear" name="cycBirthYear" required>
-                    <option value="" selected disabled data-i18n="yearPlaceholder">Year</option>
-                  </select>
-                </label>
-              </div>
+        <!-- ============ CYCLES ============ -->
+        <section class="view" id="viewCycles" data-view="cycles" hidden aria-labelledby="cyclesTitle">
+          <div class="view-head">
+            <div>
+              <p class="eyebrow" data-i18n="nav.cycles">Cycles</p>
+              <h1 id="cyclesTitle" data-i18n="cycles.title">Current cycles</h1>
+              <p class="lede" data-i18n="cycles.subtitle"></p>
+            </div>
+            <div class="scrubber" id="scrubber">
+              <button class="icon-btn" type="button" id="cycPrev" data-i18n-aria="cycles.prevDay" aria-label="Previous day">
+                <svg class="ico" aria-hidden="true"><use href="#i-left" /></svg>
+              </button>
+              <button class="scrubber__date" type="button" id="cycDateBtn">
+                <svg class="ico ico--sm" aria-hidden="true"><use href="#i-calendar" /></svg>
+                <span id="cycDateLabel">—</span>
+              </button>
+              <button class="icon-btn" type="button" id="cycNext" data-i18n-aria="cycles.nextDay" aria-label="Next day">
+                <svg class="ico" aria-hidden="true"><use href="#i-right" /></svg>
+              </button>
+              <button class="btn btn--ghost btn--sm" type="button" id="cycToday" data-i18n="common.today">Today</button>
+              <div class="mini-cal" id="cycCal" hidden></div>
+            </div>
+          </div>
+          <div id="cycBody"></div>
+        </section>
+
+        <!-- ============ BOND ============ -->
+        <section class="view" id="viewBond" data-view="bond" hidden aria-labelledby="bondTitle">
+          <div class="view-head">
+            <div>
+              <p class="eyebrow" data-i18n="nav.bond">Bond</p>
+              <h1 id="bondTitle" data-i18n="bond.title">Bond</h1>
+              <p class="lede" data-i18n="bond.subtitle"></p>
+            </div>
+          </div>
+          <div id="bondBody"></div>
+        </section>
+
+        <!-- ============ ATLAS ============ -->
+        <section class="view" id="viewAtlas" data-view="atlas" hidden aria-labelledby="atlasTitle">
+          <div class="view-head">
+            <div>
+              <p class="eyebrow" data-i18n="nav.atlas">Atlas</p>
+              <h1 id="atlasTitle" data-i18n="atlas.title">Number atlas</h1>
+              <p class="lede" data-i18n="atlas.subtitle"></p>
+            </div>
+          </div>
+          <div class="atlas-tools">
+            <label class="search">
+              <svg class="ico ico--sm" aria-hidden="true"><use href="#i-search" /></svg>
+              <input type="search" id="atlasSearch" data-i18n-placeholder="atlas.searchPlaceholder" placeholder="Search numbers, titles, keywords…" />
             </label>
-            <button class="btn btn--primary" id="cycCalculateBtn" type="button">
-              <span data-i18n="cycCalculate">Calculate Cycles</span>
+            <div class="seg" id="atlasFilter" role="group" aria-label="Filter numbers">
+              <button type="button" class="seg__btn is-on" data-filter="all" data-i18n="atlas.filterAll">All</button>
+              <button type="button" class="seg__btn" data-filter="single" data-i18n="atlas.filterSingle">Single digits</button>
+              <button type="button" class="seg__btn" data-filter="master" data-i18n="atlas.filterMaster">Master numbers</button>
+            </div>
+            <label class="select-wrap">
+              <span class="sr-only" data-i18n="common.sort">Sort</span>
+              <select id="atlasSort">
+                <option value="numeric" data-i18n="atlas.sortNumeric">Numeric</option>
+                <option value="alpha" data-i18n="atlas.sortAlpha">Title A–Z</option>
+              </select>
+              <svg class="ico ico--sm" aria-hidden="true"><use href="#i-down" /></svg>
+            </label>
+            <span class="atlas-count" id="atlasCount"></span>
+          </div>
+          <div class="atlas-grid" id="atlasGrid"></div>
+          <section class="block">
+            <header class="block__head">
+              <div>
+                <h2 data-i18n="atlas.letterChartTitle">Pythagorean letter chart</h2>
+                <p data-i18n="atlas.letterChartNote"></p>
+              </div>
+            </header>
+            <div class="letter-table" id="letterTable"></div>
+            <h3 class="sub-head" data-i18n="atlas.yExamplesTitle">Y in practice</h3>
+            <div class="y-examples" id="yExamples"></div>
+          </section>
+        </section>
+
+        <footer class="foot">
+          <span data-i18n="footer.note">Pythagorean system · calculated on this device</span>
+        </footer>
+      </main>
+    </div>
+
+    <nav class="tabbar" id="tabbar" aria-label="Views"></nav>
+
+    <div class="scrim" id="scrim" hidden></div>
+
+    <!-- Number drawer -->
+    <aside class="drawer" id="drawer" hidden aria-modal="true" role="dialog" aria-labelledby="drawerTitle">
+      <header class="drawer__head">
+        <div class="drawer__num" id="drawerNum">1</div>
+        <div class="drawer__id">
+          <p class="eyebrow" id="drawerTag"></p>
+          <h2 id="drawerTitle">—</h2>
+        </div>
+        <button class="icon-btn" type="button" id="drawerClose" data-i18n-aria="common.close" aria-label="Close">
+          <svg class="ico" aria-hidden="true"><use href="#i-close" /></svg>
+        </button>
+      </header>
+      <div class="seg seg--wide" id="drawerTabs" role="tablist">
+        <button type="button" class="seg__btn is-on" role="tab" data-dtab="meaning" data-i18n="drawer.meaning">Meaning</button>
+        <button type="button" class="seg__btn" role="tab" data-dtab="chart" data-i18n="drawer.inChart">In your chart</button>
+      </div>
+      <div class="drawer__body" id="drawerBody"></div>
+    </aside>
+
+    <!-- Journal -->
+    <aside class="journal" id="journal" hidden aria-modal="true" role="dialog" aria-labelledby="journalTitle">
+      <header class="journal__head">
+        <div>
+          <h2 id="journalTitle" data-i18n="journal.title">Journal</h2>
+          <p data-i18n="journal.subtitle">Charts stored on this device.</p>
+        </div>
+        <button class="icon-btn" type="button" id="journalClose" data-i18n-aria="common.close" aria-label="Close">
+          <svg class="ico" aria-hidden="true"><use href="#i-close" /></svg>
+        </button>
+      </header>
+      <div class="journal__tools">
+        <button class="btn btn--brass btn--sm" type="button" id="journalAdd">
+          <svg class="ico ico--sm" aria-hidden="true"><use href="#i-plus" /></svg>
+          <span data-i18n="journal.add">Save current chart</span>
+        </button>
+        <label class="search search--sm">
+          <svg class="ico ico--sm" aria-hidden="true"><use href="#i-search" /></svg>
+          <input type="search" id="journalSearch" data-i18n-placeholder="journal.searchPlaceholder" placeholder="Search names…" />
+        </label>
+        <label class="select-wrap select-wrap--sm">
+          <span class="sr-only" data-i18n="common.sort">Sort</span>
+          <select id="journalSort">
+            <option value="recent" data-i18n="journal.sortRecent">Recently added</option>
+            <option value="name" data-i18n="journal.sortName">Name A–Z</option>
+            <option value="lifepath" data-i18n="journal.sortLifePath">Life Path</option>
+          </select>
+          <svg class="ico ico--sm" aria-hidden="true"><use href="#i-down" /></svg>
+        </label>
+        <button class="icon-btn" type="button" id="journalSelect" data-i18n-aria="journal.select" aria-label="Select" aria-pressed="false">
+          <svg class="ico" aria-hidden="true"><use href="#i-select" /></svg>
+        </button>
+      </div>
+      <div class="journal__list" id="journalList"></div>
+      <div class="journal__bulk" id="journalBulk" hidden>
+        <span id="journalBulkCount"></span>
+        <button class="btn btn--ghost btn--sm" type="button" id="journalSelectAll" data-i18n="journal.selectAll">Select all</button>
+        <button class="btn btn--danger btn--sm" type="button" id="journalDeleteSel">
+          <svg class="ico ico--sm" aria-hidden="true"><use href="#i-trash" /></svg>
+          <span data-i18n="journal.deleteSelected">Delete selected</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Profile editor -->
+    <div class="modal" id="profileModal" hidden role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+      <div class="modal__card">
+        <header class="modal__head">
+          <div>
+            <h2 id="profileModalTitle" data-i18n="form.title">Your details</h2>
+            <p data-i18n="form.subtitle"></p>
+          </div>
+          <button class="icon-btn" type="button" id="profileClose" data-i18n-aria="common.close" aria-label="Close">
+            <svg class="ico" aria-hidden="true"><use href="#i-close" /></svg>
+          </button>
+        </header>
+        <form id="profileForm" novalidate>
+          <div class="field">
+            <label class="field__label" for="pName" data-i18n="form.nameLabel">Full birth name</label>
+            <input id="pName" name="name" type="text" autocomplete="name" data-i18n-placeholder="form.namePlaceholder" placeholder="e.g. Maya Rose Carter" />
+            <p class="field__hint" data-i18n="form.nameHint"></p>
+            <p class="field__err" id="pNameErr" hidden></p>
+          </div>
+          <div class="field">
+            <span class="field__label" id="pDateLabel" data-i18n="form.dateLabel">Birth date</span>
+            <div class="datefield" id="pDate" data-datefield="profile"></div>
+            <p class="field__hint" data-i18n="form.dateHint"></p>
+            <p class="field__err" id="pDateErr" hidden></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="pCurrent">
+              <span data-i18n="form.currentNameLabel">Name you use today</span>
+              <em data-i18n="form.currentNameHint">optional</em>
+            </label>
+            <input id="pCurrent" name="currentName" type="text" autocomplete="name" data-i18n-placeholder="form.currentNamePlaceholder" />
+            <p class="field__hint" data-i18n="form.currentNameNote"></p>
+          </div>
+          <div class="modal__actions">
+            <button class="btn btn--ghost" type="button" id="profileCancel" data-i18n="common.cancel">Cancel</button>
+            <button class="btn btn--primary" type="submit" id="profileSubmit">
+              <svg class="ico ico--sm" aria-hidden="true"><use href="#i-spark" /></svg>
+              <span data-i18n="form.submit">Reveal my chart</span>
             </button>
           </div>
-
-          <div id="cyclesContent">
-            <!-- Populated by JS -->
-          </div>
-        </section>
+        </form>
       </div>
-    </main>
+    </div>
 
-    <footer class="footer"></footer>
+    <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+    <div class="printsheet" id="printSheet" aria-hidden="true"></div>
 
-    <script src="script.js"></script>
+    <script src="src/numerology.js"></script>
+    <script src="src/i18n.js"></script>
+    <script src="src/app.js"></script>
   </body>
 </html>
