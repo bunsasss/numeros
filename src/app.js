@@ -156,21 +156,36 @@
   };
 
   /* ---------------- sky ---------------- */
+  let skyCtl = null;
   function initSky() {
     const canvas = $('#sky');
     const g = canvas.getContext && canvas.getContext('2d');
     if (!g) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let w = 0, h = 0, pts = [], raf = 0, alive = false;
+    let w = 0, h = 0, pts = [], raf = 0, alive = false, paused = false, last = 0;
     const pointer = { x: -999, y: -999 };
 
+    /* Ambient drift reads as continuous at 30fps and costs half the compositing. */
+    const STEP = 1000 / 32;
+    const LINK_D2 = 15000;
+    const LINK_A = [0.03, 0.06, 0.09, 0.13];
+    const DOT_A = [0.14, 0.26, 0.38, 0.5, 0.64, 0.8];
+    const segs = LINK_A.map(() => []);
+    const dots = DOT_A.map(() => []);
+    let linkStyle = [], dotStyle = [];
+
+    function palette() {
+      const rgb = getComputedStyle(document.documentElement).getPropertyValue('--sky-dot').trim() || '210,230,255';
+      linkStyle = LINK_A.map((a) => `rgba(${rgb},${a})`);
+      dotStyle = DOT_A.map((a) => `rgba(${rgb},${a})`);
+    }
+
     function resize() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       w = window.innerWidth; h = window.innerHeight;
-      canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+      canvas.width = w; canvas.height = h;
       canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
-      g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = clamp(Math.round((w * h) / 24000), 30, 84);
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      const count = clamp(Math.round((w * h) / 34000), 22, 54);
       pts = Array.from({ length: count }, () => ({
         x: Math.random() * w, y: Math.random() * h,
         vx: (Math.random() - 0.5) * 0.13, vy: (Math.random() - 0.5) * 0.13,
@@ -178,52 +193,78 @@
       }));
     }
 
-    function draw(time) {
-      const dot = getComputedStyle(document.documentElement).getPropertyValue('--sky-dot').trim() || '210,230,255';
+    function draw(time, k) {
       g.clearRect(0, 0, w, h);
+      for (let i = 0; i < segs.length; i += 1) segs[i].length = 0;
+      for (let i = 0; i < dots.length; i += 1) dots[i].length = 0;
+
       for (let i = 0; i < pts.length; i += 1) {
         const p = pts[i];
-        if (!reduce) {
-          p.x += p.vx; p.y += p.vy;
+        if (k) {
+          p.x += p.vx * k; p.y += p.vy * k;
           if (p.x < -20) p.x = w + 20; if (p.x > w + 20) p.x = -20;
           if (p.y < -20) p.y = h + 20; if (p.y > h + 20) p.y = -20;
         }
         for (let j = i + 1; j < pts.length; j += 1) {
           const q = pts[j]; const dx = p.x - q.x; const dy = p.y - q.y;
           const d2 = dx * dx + dy * dy;
-          if (d2 < 15000) {
-            g.strokeStyle = `rgba(${dot},${(1 - d2 / 15000) * 0.13})`;
-            g.lineWidth = 0.6;
-            g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(q.x, q.y); g.stroke();
+          if (d2 < LINK_D2) {
+            const b = Math.min(LINK_A.length - 1, ((1 - d2 / LINK_D2) * LINK_A.length) | 0);
+            segs[b].push(p.x, p.y, q.x, q.y);
           }
         }
+        const tw = k ? 0.45 + 0.4 * Math.sin(time / 1400 + p.ph) : 0.6;
+        const px = p.x - pointer.x; const py = p.y - pointer.y;
+        const near = Math.max(0, 1 - Math.sqrt(px * px + py * py) / 190);
+        const a = clamp(tw * 0.55 + near * 0.5, 0, 0.95);
+        dots[Math.min(DOT_A.length - 1, (a * DOT_A.length) | 0)].push(p.x, p.y, p.r + near * 1.5);
       }
-      for (const p of pts) {
-        const tw = reduce ? 0.6 : 0.45 + 0.4 * Math.sin(time / 1400 + p.ph);
-        const dx = p.x - pointer.x; const dy = p.y - pointer.y;
-        const near = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) / 190);
-        g.fillStyle = `rgba(${dot},${clamp(tw * 0.55 + near * 0.5, 0, 0.95)})`;
-        g.beginPath(); g.arc(p.x, p.y, p.r + near * 1.5, 0, Math.PI * 2); g.fill();
+
+      g.lineWidth = 0.6;
+      for (let b = 0; b < segs.length; b += 1) {
+        const s = segs[b];
+        if (!s.length) continue;
+        g.strokeStyle = linkStyle[b];
+        g.beginPath();
+        for (let i = 0; i < s.length; i += 4) { g.moveTo(s[i], s[i + 1]); g.lineTo(s[i + 2], s[i + 3]); }
+        g.stroke();
+      }
+      for (let b = 0; b < dots.length; b += 1) {
+        const d = dots[b];
+        if (!d.length) continue;
+        g.fillStyle = dotStyle[b];
+        g.beginPath();
+        for (let i = 0; i < d.length; i += 3) { g.moveTo(d[i] + d[i + 2], d[i + 1]); g.arc(d[i], d[i + 1], d[i + 2], 0, Math.PI * 2); }
+        g.fill();
       }
     }
 
     function frame(time) {
       if (!alive) return;
-      draw(time);
       raf = window.requestAnimationFrame(frame);
+      if (time - last < STEP) return;
+      const k = Math.min(3, (time - last) / 16.667);
+      last = time;
+      draw(time, k);
     }
 
-    function start() { if (alive) return; alive = true; raf = window.requestAnimationFrame(frame); }
+    function start() { if (alive || paused || reduce) return; alive = true; last = 0; raf = window.requestAnimationFrame(frame); }
     function stop() { alive = false; window.cancelAnimationFrame(raf); }
 
+    palette();
     resize();
-    draw(0);
-    if (!reduce) start();
+    draw(0, 0);
+    start();
     let rt = 0;
-    window.addEventListener('resize', () => { window.clearTimeout(rt); rt = window.setTimeout(() => { resize(); draw(0); }, 160); });
+    window.addEventListener('resize', () => { window.clearTimeout(rt); rt = window.setTimeout(() => { resize(); draw(last, 0); }, 160); }, { passive: true });
     window.addEventListener('pointermove', (e) => { pointer.x = e.clientX; pointer.y = e.clientY; }, { passive: true });
     document.addEventListener('pointerleave', () => { pointer.x = -999; pointer.y = -999; });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else if (!reduce) start(); });
+    document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else start(); });
+
+    skyCtl = {
+      palette() { palette(); draw(last, 0); },
+      pause(on) { paused = on; if (on) stop(); else start(); },
+    };
   }
 
   /* ---------------- reveal ---------------- */
@@ -285,6 +326,7 @@
     $('#scrim').hidden = false;
     document.body.style.overflow = 'hidden';
     openStack.push({ node, onClose });
+    if (skyCtl) skyCtl.pause(true);
     const f = focusables(node);
     if (f.length) f[0].focus();
   }
@@ -294,7 +336,7 @@
     const entry = openStack.splice(idx, 1)[0];
     entry.node.hidden = true;
     if (entry.onClose) entry.onClose();
-    if (!openStack.length) { $('#scrim').hidden = true; document.body.style.overflow = ''; }
+    if (!openStack.length) { $('#scrim').hidden = true; document.body.style.overflow = ''; if (skyCtl) skyCtl.pause(false); }
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   function closeTop() { if (openStack.length) closeOverlay(openStack[openStack.length - 1].node); }
@@ -616,8 +658,8 @@
     }
 
     const lp = c.lifePath.value;
+    $('#wheelTicks').innerHTML = ticks;
     svg.innerHTML = `
-      <g class="w-ticks">${ticks}</g>
       <circle class="w-ring" cx="${cx}" cy="${cy}" r="186"/>
       <circle class="w-ring" cx="${cx}" cy="${cy}" r="120"/>
       ${links}
@@ -1544,6 +1586,7 @@
   function setTheme(next) {
     state.theme = next;
     document.documentElement.dataset.theme = next;
+    if (skyCtl) skyCtl.palette();
     persist(); renderChrome();
     toast(next === 'obsidian' ? t('toast.themeDark') : t('toast.themeLight'), { icon: next === 'obsidian' ? 'i-moon' : 'i-sun' });
   }
